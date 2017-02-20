@@ -7,6 +7,9 @@
 #include <iostream>
 #include <cstdlib>
 #include <mpi.h>
+#include "render.hh"
+
+using namespace std;
 
 int convertY(int height, int linearPlace){
 	return (linearPlace / height);
