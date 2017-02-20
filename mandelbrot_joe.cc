@@ -119,7 +119,7 @@ int main (int argc, char* argv[])
 		
 		for(i=0;i<height;i++){
 			for(j=0;j<width;j++){
-				img_view(j,i) = img_main(convertLinear(i,j,width));
+				img_view(j,i) = img_main[convertLinear(i,j,width)];
 			}
 		}
 		
