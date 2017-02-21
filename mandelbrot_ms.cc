@@ -84,47 +84,41 @@ main (int argc, char* argv[])
 	int work_row = 0;	
 	
 	if(rank == 0){
-
 		img_main = (int *)malloc(sizeof(int)*width*height);
 		for(i=1;i<P;i++){
 			MPI_Send(&row, 1, MPI_INT, i, W_TAG, MPI_COMM_WORLD);
 			row++;
-//			printf("row =%d\n", row);
 		}
+
 		for(i = row;i < height;i++){
 			MPI_Recv(&img_subset, width+1, MPI_INT, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
-	//		printf("size = %d, width = %d\n", sizeof(img_subset)/sizeof(int), width+1);
 			subset_to_main(img_subset, img_main, width);
-	//		printf("one.two\n");
 			MPI_Send(&row, 1, MPI_INT, status.MPI_SOURCE, W_TAG, MPI_COMM_WORLD);	
 			row++;
-//			printf("row=%d\n", row);
 		}	
 		
 		for(i=1;i<P;i++){
 			MPI_Recv(&img_subset, width+1, MPI_INT, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
 			subset_to_main(img_subset, img_main, width);
 		}
+
 		for(i=1;i<P;i++){
 			MPI_Send(0, 0, MPI_INT, i, S_TAG, MPI_COMM_WORLD);
 		}
 	}
 	else{
-//		img_subset = (int *)malloc(sizeof(int)*(width+1));
 		while(1){
 			MPI_Recv(&work_row, 1, MPI_INT, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
-//			printf("work row = %d, rank = %d, status = %d\n",  work_row, rank, status.MPI_TAG);
+
 			if(status.MPI_TAG == S_TAG){
 				break;
-			}	
+			}
+	
 			k = 0;
 			y = minY + work_row*it;
 			x = minX;
-//			printf("minx = %f\n", minX);
 			for(j=0;j<width;j++){
-				img_subset[k] = mandelbrot(x, y);
-//				printf("row = %d, y = %f, x = %f\n", work_row, y, x);
-//				printf("madnel = %d\n", img_subset[k]);	
+				img_subset[k] = mandelbrot(x, y);	
 				x += jt;
 				k++;
 			}
@@ -138,10 +132,6 @@ main (int argc, char* argv[])
 		gil::rgb8_image_t img(width, height);
 		auto img_view = gil::view(img);
 
-/*		for(i=0;i<width*height;i++){
-			printf("img = %d\n", img_main[i]);
-		}*/
-
 		k = 0;
 		for(i=0;i<height;i++){
 			for(j=0;j<width;j++){
@@ -150,6 +140,7 @@ main (int argc, char* argv[])
 			}
 		}
 		gil::png_write_view("mandelbrot_ms.png", const_view(img));
+//		free(img_main);
 	}	
 	MPI_Finalize();
 	return 0;

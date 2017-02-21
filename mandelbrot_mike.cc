@@ -77,27 +77,26 @@ main (int argc, char* argv[])
 	if(rank == 0){
 		img_main = (int *)malloc(sizeof(int)*width*height);
 		recvcounts = (int *)malloc(sizeof(int)*P);
-	}	
+	}
+	//Leftover blocks are put into the last processor for processing; Leftover blocks appear when the height and processor size do not divide neatly
+	//So the end point of the last processor is changed to the end of the whole array	
 	if(rank == (P - 1) && height % P != 0){
 		end = height-1;
 		subset_h = height - rank*N;
 	}
 	img_subset = (int *)malloc(sizeof(int)*width*subset_h);
 		
-//	y = minY
-	//	printf("z = %d, end = %d\n", z, end);
 	for(i = z;i <= end;i++){
-		y = minY + i*it;
+		y = minY + i*it; //Allows for y to start at the proper value for the block
 		x = minX;
 		for(j = 0;j<width;j++){
 			img_subset[k] = mandelbrot(x, y);
-		//	printf("madnelbrot = %d, rank = %d, k = %d\n", img_subset[k], rank, k);
 			x += jt;
 			k++;
 		}
 	}
 	rcount = k;
-//	printf("rank = %d, count = %d\n", rank, k);
+
 	MPI_Gather(&rcount, 1, MPI_INT, recvcounts, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
 	if(rank == 0){
@@ -109,7 +108,6 @@ main (int argc, char* argv[])
 		}
 	}
 
-//	printf("rcount = %d, img_subset = %d, N = %d, end = %d\n", rcount, N*width, N, end);
 
 	MPI_Gatherv(img_subset, rcount, MPI_INT, img_main, recvcounts, displs, MPI_INT, 0, MPI_COMM_WORLD);
 
@@ -121,16 +119,15 @@ main (int argc, char* argv[])
 		for(i = 0;i < height;i++){
 			for(j = 0;j < width;j++){
 				img_view(j, i) = render(img_main[k]/512.0);
-			//	printf("mandel = %d\n", img_main[k]);
 				k++;
 			}
 		}
 		gil::png_write_view("mandelbrot_joe.png", const_view(img));
-//		free(img_main);
-//		free(displs);
-//		free(recvcounts);
+	//	free(img_main);
+	//	free(displs);
+	//	free(recvcounts);
 	}
-//	MPI_Barrier(MPI_COMM_WORLD);
+
 //	free(img_subset);	
 	MPI_Finalize();
 	return 0;	

@@ -139,6 +139,10 @@ main (int argc, char* argv[])
 			n = 0;
 		}
 		gil::png_write_view("mandelbrot_susie.png", const_view(img));
+	//	free(img_main);
+	//	free(displs);
+	//	free(recvcounts);
+	//	free(total_subsets);
 	}
 	MPI_Finalize();
 	return 0;
