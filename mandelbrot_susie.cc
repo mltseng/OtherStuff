@@ -119,7 +119,7 @@ main (int argc, char* argv[])
 		}	
 	}
 
-	MPI_Gatherv(img_subset, subset_num*width, MPI_INT, img_main, recvcounts, displs, MPI_INT, 0, MPI_COMM_WORLD);
+	MPI_Gatherv(img_subset, rcount, MPI_INT, img_main, recvcounts, displs, MPI_INT, 0, MPI_COMM_WORLD);
 	
 	if(rank == 0){
 		gil::rgb8_image_t img(width, height);
@@ -141,6 +141,7 @@ main (int argc, char* argv[])
 		gil::png_write_view("mandelbrot_susie.png", const_view(img));
 	}
 	MPI_Finalize();
+	return 0;
 }
 
 /* eof */
