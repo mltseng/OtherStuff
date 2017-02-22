@@ -18,4 +18,6 @@ module load openmpi-1.8.3/gcc-4.9.2
 
 # Run the program 
 #mpirun -np 1  ./mandelbrot_serial 1000 1000
-mpirun -np 64 ./mandelbrot_susie 1000 100
+#mpirun -np 64 ./mandelbrot_susie 1000 1000
+#mpirun -np 64 ./mandelbrot_joe 1000 1000 
+mpirun -np 64 ./mandelbrot_ms 1000 1000
